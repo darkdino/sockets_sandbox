@@ -1,0 +1,50 @@
+<html>
+	<head>
+		<script src="/socket.io/socket.io.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+		<script>
+			var socket = io.connect('http://localhost:8080');
+			
+			$("#console").html('<p>start</p>');
+			//console.log('start');
+			
+			
+			socket.on('connect', function(){
+				$("#console").append('<p>connected</p>');
+				//console.log('connected');
+			});
+			
+			var id='';
+			
+			socket.on('yourid', function (data) {
+				$("#console").append('<p>Got an id: '+data.id+'</p>');
+				id=data.id
+				for(var i=0;i<1;i++){
+					socket.emit('message', { msg: 'hello server, my id is: ' + data.id + ' this is spam number ' +i });
+				}
+			});
+			
+			socket.on('reply', function (data) {
+				$("#console").append('<p>From server: '+data.msg+'</p>');
+			});
+
+			socket.on('reconnect', function(){
+				console.log('reconnected');
+			});
+			
+			
+			//onload callback
+			$(function(){
+				$("#ping").click(function() {
+					//console.log('ping');
+					socket.emit('message', {msg: 'This is ping command from id: '+id});
+				});
+			});
+
+		</script>
+	</head>
+	<body>
+		<div id="console"></div>
+		<input type="button" id="ping" value="Send message" />
+	</body>
+</html>
